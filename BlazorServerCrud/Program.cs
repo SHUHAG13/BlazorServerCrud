@@ -13,9 +13,10 @@ namespace BlazorServerCrud
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+            builder.Services.AddScoped<IPersonService, PersonService>();
             builder.Services.AddDbContext<DatabaseContext>(options =>
            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddTransient<IPersonService, PersonService>();
+           
 
             var app = builder.Build();
 

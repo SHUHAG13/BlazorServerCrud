@@ -1,26 +1,22 @@
 ﻿@page "/person/add"
 @page "/person/edit/{userId:int}"
 @inject IPersonService personService
+
 <PageTitle> @Title</PageTitle>
 <h3>@Title</h3>
 <a href="#" class="btn btn-outline-dark">Show All</a>
 <div class="row">
 	<div class="col-md-6">
-		<EditForm Model="@person" OnInvalidSubmit="Save" name="personForm">
-			<input type="hidden" name="FormName" value="PersonForm" />
-			<DataAnnotationsValidator/>
+		<EditForm Model="@person" OnValidSubmit="SaveData" FormName="person-form">
 			<div class="form-group">
-             <label for="Name">Name</label>
-			 <InputText class="form-control" @bind-Value="person.Name"/>
-			 <ValidationMessage For="@(()=>person.Name)"/>
+				<label for="Name">Name</label>
+				<InputText class="form-control" @bind-Value="person.Name" />
 			</div>
-			<DataAnnotationsValidator />
 			<div class="form-group">
 				<label for="Email">Email</label>
 				<InputText class="form-control" @bind-Value="person.Email" />
-				<ValidationMessage For="@(()=>person.Email)" />
 			</div>
-		  
+
 			<div class="alert alert-success" role="alert" style="display:@(string.IsNullOrEmpty(message) ? "none" : "block")">
 				@message
 			</div>
@@ -28,21 +24,25 @@
 			<div class="my-2">
 				<button type="submit" class="btn btn-primary"> Save</button>
 			</div>
-			
-
 		</EditForm>
 	</div>
 </div>
 @code {
 	[Parameter]
 	public int UserId { get; set; }
-	private string message = string.Empty;
-	Models.Person person = new();
+	private string message { get; set; } = string.Empty;
+	Models.Person person { get; set; } = new();
 	private string Title = "Add Person";
 
-	private void Save()
+	public async Task SaveData()
 	{
-		if (personService.AddUpdate(person))
+		person = new Models.Person
+			{
+				Email = "Sanzid@a.com",
+				Name = "Sanzid",
+			};
+		var res = personService.AddUpdate(person);
+		if (res == true)
 		{
 			message = "Successfully added";
 			person = new();
@@ -56,10 +56,10 @@
 	}
 	protected override void OnInitialized()
 	{
-		if(UserId>0)
+		if (UserId > 0)
 		{
 			Title = "Update Person";
-			person = personService.FindById(UserId)??new Models.Person();
+			person = personService.FindById(UserId) ?? new Models.Person();
 		}
 		base.OnInitialized();
 	}
